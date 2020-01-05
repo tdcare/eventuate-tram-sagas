@@ -33,6 +33,10 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
   public SagaActions<Data> handleReply(String currentState, Data sagaData, Message message) {
 
     SagaExecutionState state = SagaExecutionStateJsonSerde.decodeState(currentState);
+    if(state.getCurrentlyExecuting()<0){//如果saga 中的执行步骤小于0了，直接结束saga
+       return makeEndStateSagaActions(state);
+    }
+
     SagaStep<Data> currentStep = sagaSteps.get(state.getCurrentlyExecuting());
     boolean compensating = state.isCompensating();
 
@@ -43,7 +47,7 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     if (currentStep.isSuccessfulReply(compensating, message)) {
       return executeNextStep(sagaData, state);
     } else if (compensating) {
-      throw new UnsupportedOperationException("Failure when compensating");
+      throw new UnsupportedOperationException("补偿操作失败 Failure when compensating");
     } else {
       return executeNextStep(sagaData, state.startCompensating());
     }
@@ -55,7 +59,11 @@ public class SimpleSagaDefinition<Data> implements SagaDefinition<Data> {
     int skipped = 0;
     boolean compensating = state.isCompensating();
     int direction = compensating ? -1 : +1;
-    for (int i = state.getCurrentlyExecuting() + direction; i >= 0 && i < sagaSteps.size(); i = i + direction) {
+    int j = state.getCurrentlyExecuting() + direction;
+
+    //if(compensating && j<0){j=0;}//saga 第一步如果执行补偿动作，需要从第0步开始
+
+    for (int i=j; i >= 0 && i < sagaSteps.size(); i = i + direction) {
       SagaStep<Data> step = sagaSteps.get(i);
       if ((compensating ? step.hasCompensation(data) : step.hasAction(data))) {
         return new StepToExecute<>(Optional.of(step), skipped, compensating);
