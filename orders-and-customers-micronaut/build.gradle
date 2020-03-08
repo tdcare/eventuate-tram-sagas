@@ -1,0 +1,53 @@
+plugins {
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.micronaut:micronaut-bom:1.2.0'
+    }
+}
+
+dependencies {
+    compile project(":orders-and-customers")
+    compile project(":eventuate-tram-sagas-micronaut-orchestration")
+    compile project(":eventuate-tram-sagas-micronaut-participant")
+
+    compile "io.eventuate.common:eventuate-common-micronaut-spring-jdbc:$eventuateCommonVersion"
+    compile "io.eventuate.util:eventuate-util-test:$eventuateUtilVersion"
+    compile project(":eventuate-tram-sagas-testing-support")
+
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-producer-jdbc:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-jdbc:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-messaging:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-consumer-kafka:$eventuateTramVersion"
+    compile "io.eventuate.tram.core:eventuate-tram-micronaut-events:$eventuateTramVersion"
+
+    compile "io.micronaut:micronaut-spring"
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    annotationProcessor "io.micronaut:micronaut-validation"
+    annotationProcessor "io.micronaut.configuration:micronaut-openapi"
+    compile "io.micronaut:micronaut-inject"
+    compile "io.micronaut:micronaut-validation"
+    compile "io.micronaut:micronaut-runtime"
+    compile  'org.springframework:spring-jdbc'
+    compile "io.micronaut.configuration:micronaut-hibernate-jpa"
+    annotationProcessor "javax.persistence:javax.persistence-api:2.2"
+    compile 'io.micronaut.configuration:micronaut-jdbc-hikari'
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    compile "org.junit.jupiter:junit-jupiter-api"
+    compile "io.micronaut.test:micronaut-test-junit5"
+    runtime "org.junit.jupiter:junit-jupiter-engine"
+}
+
+// use JUnit 5 platform
+test {
+    useJUnitPlatform()
+}
+
+

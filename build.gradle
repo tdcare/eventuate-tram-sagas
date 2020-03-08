@@ -11,10 +11,6 @@ buildscript {
 
 apply plugin: 'docker-compose'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
-}
-
 allprojects {
     group = "io.eventuate.tram.sagas"
 }
@@ -45,6 +41,7 @@ subprojects {
 
 
     bintray {
+        publish = true
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
         configurations = ['archives']
